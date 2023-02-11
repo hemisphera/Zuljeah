@@ -11,8 +11,8 @@ You define your songs in a single REAPER project, each one a REAPER region. The 
 
 ## Configuration
 - Set up REAPER: Go to **Preferences** > **Control/OSC/web** and add "Web browser interface" as control surface
-- Make note of the port that you assign. The default port is usually 8080.
-- Should you choose a different port than 8080, you need to set that same port in `appsettings.json` on Zuljeah
+- Make note of the access URI that you assign. The URI is usually http://localhost:8080.
+- Should you choose a different port than 8080, you need to set that same port in `appsettings.json` (property `ReaperUri`) on Zuljeah
 
 ## Usage
 
