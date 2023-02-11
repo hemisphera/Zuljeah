@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using DevExpress.Xpo.Logger.Transport;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Eos.Mvvm.Commands;
 using Eos.Mvvm.EventArgs;
 using Eos.Mvvm.UiModel;
+using Microsoft.Extensions.Options;
 using Reaper.Api.Client;
 
 namespace WpfApp1;
 
 public class MainVm : ViewModelBase, IHost
 {
-
-  private static MainVm? _instance;
-
-  public static MainVm Instance => _instance ??= new();
-
 
   public ReaperApiClient Client { get; }
 
@@ -50,17 +43,15 @@ public class MainVm : ViewModelBase, IHost
   }
 
 
-  private MainVm()
+  public MainVm(IOptions<ZuljeahConfiguration> config)
   {
     ActionRoot = new UiCommandCategory();
-    //Actions.CollectFrom(this);
 
-    Client = new ReaperApiClient(new Uri("http://localhost:8080"));
+    Client = new ReaperApiClient(config.Value.ReaperUri);
 
     Task.Run(async () =>
     {
       await Client.RegisterCallback(TimeSpan.FromMilliseconds(100), UpdateTransportInfo);
-      //await Client.RegisterCallback(TimeSpan.FromSeconds(5), UpdateRegions);
     });
   }
 

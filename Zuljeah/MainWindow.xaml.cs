@@ -19,7 +19,7 @@ public partial class MainWindow : Window
   public MainWindow()
   {
     InitializeComponent();
-    DataContext = MainVm.Instance;
+    DataContext = App.MainVmInstance;
   }
 
   private void RibbonPageGroup_ItemTemplateSelector_OnOnSelectTemplate(object sender, DataTemplateEventArgs e)
@@ -43,10 +43,10 @@ public partial class MainWindow : Window
         await player.PlayItem(player.SelectedItem);
 
     if (e.Key == Key.Escape)
-      await MainVm.Instance.Client.Stop();
+      await App.MainVmInstance.Client.Stop();
 
     if (e.Key == Key.Space)
-      await MainVm.Instance.Client.TogglePause();
+      await App.MainVmInstance.Client.TogglePause();
   }
 
 }

@@ -70,7 +70,7 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   [UiCommand(Caption = "Close", Page = "Editor", Group = "Edit", Image = "Close")]
   public async Task ClosePage()
   {
-    await MainVm.Instance.ClosePage(this);
+    await App.MainVmInstance.ClosePage(this);
   }
 
 }
