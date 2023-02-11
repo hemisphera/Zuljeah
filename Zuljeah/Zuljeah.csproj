@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="21.1.11" />
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="21.1.11" />
+    <PackageReference Include="Eos.Lib.Io" Version="3.0.16" />
+    <PackageReference Include="Eos.Mvvm" Version="3.0.0" />
+    <PackageReference Include="Eos.NAVImageLibrary" Version="1.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reaper.ApiClient\Reaper.Api.Client\Reaper.Api.Client.csproj" />
+  </ItemGroup>
+
+</Project>
