@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Reaper.Api.Client;
 using System.Threading.Tasks;
 using DevExpress.Data.Extensions;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
-using Eos.Mvvm.Commands;
 
 namespace WpfApp1;
 

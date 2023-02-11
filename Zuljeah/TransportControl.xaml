@@ -18,7 +18,7 @@
     <Border DockPanel.Dock="Top" Background="DarkGreen" Height="35" >
       <TextBlock Text="{Binding Path=Transport, Converter={StaticResource TimeSpanConverter}, TargetNullValue=No connection}" DockPanel.Dock="Top" 
                  HorizontalAlignment="Center" VerticalAlignment="Center"
-                 FontSize="20" Foreground="LightYellow"/>
+                 FontFamily="Consolas" FontSize="20" Foreground="LightYellow"/>
     </Border>
 
   </DockPanel>

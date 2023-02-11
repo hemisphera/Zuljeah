@@ -18,8 +18,9 @@ public partial class TransportControl : UserControl
   private void TimeSpanConverter_OnOnConvert(object? sender, ConverterEventArgs e)
   {
     if (e.Value == null) return;
-    var ts = (TransportInfo)e.Value;
-    e.Result = TimeSpan.FromSeconds(Math.Round(ts.TimePosition.TotalSeconds, 0));
+    var ti = (TransportInfo)e.Value;
+    var newTs = TimeSpan.FromSeconds(Math.Round(ti.TimePosition.TotalSeconds, 0));
+    e.Result = $"[{ti.State}] {newTs}";
   }
 
 }
