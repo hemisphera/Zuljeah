@@ -6,7 +6,7 @@ using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Hsp.Reaper.ApiClient;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 {

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Eos.Mvvm.Commands;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 public interface IPage
 {

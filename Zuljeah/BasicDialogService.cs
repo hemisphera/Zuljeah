@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 using Eos.Mvvm.Dialogs;
 using Eos.Mvvm.EventArgs;
 using Ookii.Dialogs.Wpf;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 internal class BasicDialogService : DialogService
 {

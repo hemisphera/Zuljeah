@@ -3,10 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
-using Eos.Mvvm.Commands;
-using Eos.Mvvm.EventArgs;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 {

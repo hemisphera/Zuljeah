@@ -4,7 +4,7 @@ using Eos.Mvvm;
 using Hsp.Reaper.ApiClient;
 using Newtonsoft.Json;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class SetlistItem : ObservableEntity

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.IO;
-using Eos.Mvvm;
 using System.Reflection;
 using System.Windows;
+using Eos.Mvvm;
 using Eos.Mvvm.DataTemplates;
 using Eos.Mvvm.EventArgs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 /// <summary>
 /// Interaction logic for App.xaml

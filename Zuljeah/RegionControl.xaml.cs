@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Eos.Mvvm.EventArgs;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 /// <summary>
 /// Interaction logic for RegionControl.xaml

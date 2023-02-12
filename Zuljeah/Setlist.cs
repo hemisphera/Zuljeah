@@ -9,7 +9,7 @@ using Hsp.Reaper.ApiClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 public class Setlist : IJsonSerializable
 {

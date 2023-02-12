@@ -7,10 +7,10 @@ using Eos.Mvvm.Attributes;
 using Eos.Mvvm.Commands;
 using Eos.Mvvm.EventArgs;
 using Eos.Mvvm.UiModel;
-using Microsoft.Extensions.Options;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.Options;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 public class MainVm : ViewModelBase, IHost
 {

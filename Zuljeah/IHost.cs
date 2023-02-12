@@ -1,6 +1,6 @@
 ﻿using Hsp.Reaper.ApiClient;
 
-namespace WpfApp1;
+namespace Zuljeah;
 
 public interface IHost
 {
