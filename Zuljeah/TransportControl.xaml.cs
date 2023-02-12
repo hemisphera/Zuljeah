@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using Eos.Mvvm.EventArgs;
-using Reaper.Api.Client;
+using Hsp.Reaper.ApiClient;
 
 namespace WpfApp1;
 

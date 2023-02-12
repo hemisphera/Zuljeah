@@ -1,4 +1,4 @@
-﻿using Reaper.Api.Client;
+﻿using Hsp.Reaper.ApiClient;
 
 namespace WpfApp1;
 

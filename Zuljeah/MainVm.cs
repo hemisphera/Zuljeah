@@ -8,7 +8,7 @@ using Eos.Mvvm.Commands;
 using Eos.Mvvm.EventArgs;
 using Eos.Mvvm.UiModel;
 using Microsoft.Extensions.Options;
-using Reaper.Api.Client;
+using Hsp.Reaper.ApiClient;
 
 namespace WpfApp1;
 
