@@ -51,7 +51,7 @@ public class MainVm : ViewModelBase, IHost
 
     Task.Run(async () =>
     {
-      await Client.RegisterCallback(TimeSpan.FromMilliseconds(100), UpdateTransportInfo);
+      await Client.RegisterCallback(TimeSpan.FromMilliseconds(250), UpdateTransportInfo);
     });
   }
 
@@ -94,13 +94,6 @@ public class MainVm : ViewModelBase, IHost
     }
 
     await Task.WhenAll(Pages.OfType<PlayerPage>().Select(p => p.UpdateTransport(tpi)));
-  }
-
-  public async Task Play(int regionId)
-  {
-    await Client.Stop();
-    await Client.GoToRegion(regionId);
-    await Client.Play();
   }
 
   internal async Task LoadSetlist(string filename)

@@ -24,7 +24,8 @@ public class SetlistItem : ObservableEntity
   [JsonProperty]
   public TimeSpan? StartDelay { get; set; }
 
-  public bool AutoStopAfter { get; set; }
+  [JsonProperty]
+  public AfterPlaybackAction AfterPlayback { get; set; }
 
 
   public string? RegionName => Region?.Name;

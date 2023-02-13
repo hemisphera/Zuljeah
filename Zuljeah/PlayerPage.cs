@@ -39,10 +39,13 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     private set => SetAutoFieldValue(value);
   }
 
+  public TracklistPart Tracklist { get; }
+
 
   public PlayerPage(IHost host)
   {
     Host = host;
+    Tracklist = new TracklistPart(host);
   }
 
 
@@ -55,7 +58,9 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   [UiCommand(Caption = "Play", Image = "Start")]
   public async Task Play()
   {
-    await Host.Client.Play();
+    var item = SelectedItem;
+    if (item != null)
+      await PlayItem(item);
   }
 
   [UiCommand(Caption = "Pause", Image = "Pause")]
@@ -109,7 +114,14 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   private async Task FinishPlaying(SetlistItem item)
   {
-    await Host.Client.Stop();
+    if (item.AfterPlayback == AfterPlaybackAction.Pause)
+      await Host.Client.TogglePause();
+    if (item.AfterPlayback == AfterPlaybackAction.Stop)
+      await Host.Client.Stop();
+
+    if (item.AfterPlayback == AfterPlaybackAction.Continue)
+      await PlayItem(GetNextItem(item));
+
     SelectedItem = GetNextItem(item);
   }
 
@@ -120,9 +132,11 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     return Items.TryGetValue(currIndex + 1, out var nextItem) ? nextItem : null;
   }
 
-  public async Task PlayItem(SetlistItem item)
+  public async Task PlayItem(SetlistItem? item)
   {
     await Stop();
+    if (item == null) return;
+
     await Host.Client.GoToRegion(item.RegionId);
     if (item.StartDelay != null)
       await Task.Delay(item.StartDelay.Value);
