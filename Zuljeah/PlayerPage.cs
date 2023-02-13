@@ -5,6 +5,7 @@ using DevExpress.Data.Extensions;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.Options;
 
 namespace Zuljeah;
 
@@ -42,10 +43,12 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   public TracklistPart Tracklist { get; }
 
 
-  public PlayerPage(IHost host)
+  public PlayerPage(IHost host, ZuljeahConfiguration config)
   {
     Host = host;
-    Tracklist = new TracklistPart(host);
+
+    if (config.EnableTracklist)
+      Tracklist = new TracklistPart(host);
   }
 
 

@@ -63,10 +63,3 @@ public partial class App : Application
   }
 
 }
-
-public class ZuljeahConfiguration
-{
-
-  public Uri ReaperUri { get; set; }
-
-}

@@ -25,6 +25,8 @@ public class MainVm : ViewModelBase, IHost
 
   public ObservableCollection<IPage> Pages { get; } = new();
 
+  private ZuljeahConfiguration Configuration { get; }
+
   public IPage? CurrentPage
   {
     get => GetAutoFieldValue<IPage>();
@@ -46,7 +48,7 @@ public class MainVm : ViewModelBase, IHost
   public MainVm(IOptions<ZuljeahConfiguration> config)
   {
     ActionRoot = new UiCommandCategory();
-
+    Configuration = config.Value;
     Client = new ReaperApiClient(config.Value.ReaperUri);
 
     Task.Run(async () =>
@@ -58,7 +60,7 @@ public class MainVm : ViewModelBase, IHost
 
   public async Task Initialize(string[] args)
   {
-    await AddPage(new PlayerPage(this));
+    await AddPage(new PlayerPage(this, Configuration));
     var filename = args.FirstOrDefault();
     if (!String.IsNullOrEmpty(filename))
       await LoadSetlist(filename);
