@@ -67,16 +67,16 @@ public class SetlistItem : ObservableEntity
 
 
 
-  public async Task UpdateTransport(TransportInfo? tpi)
+  public async Task UpdateTransport(TimeSpan? time)
   {
-    if (tpi == null || Region == null)
+    if (time == null || Region == null)
     {
       IsActive = false;
       Percentage = 0;
       return;
     }
 
-    IsActive = tpi.TimePosition <= Region.End && tpi.TimePosition >= Region.Start;
+    IsActive = time <= Region.End && time >= Region.Start;
     if (!IsActive)
     {
       Percentage = 0;
@@ -84,8 +84,8 @@ public class SetlistItem : ObservableEntity
     }
     else
     {
-      Percentage = (tpi.TimePosition - Region.Start).TotalMilliseconds / Region.Duration.TotalMilliseconds;
-      RegionTimeRemaining = RegionDuration - (tpi.TimePosition - RegionStart);
+      Percentage = (time.Value - Region.Start).TotalMilliseconds / Region.Duration.TotalMilliseconds;
+      RegionTimeRemaining = RegionDuration - (time - RegionStart);
     }
 
     await Task.CompletedTask;

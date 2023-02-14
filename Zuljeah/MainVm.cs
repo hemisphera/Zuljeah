@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Eos.Mvvm;
@@ -53,7 +54,7 @@ public class MainVm : ViewModelBase, IHost
 
     Task.Run(async () =>
     {
-      await Client.RegisterCallback(TimeSpan.FromMilliseconds(250), UpdateTransportInfo);
+      await Client.RegisterCallback("Tick", TimeSpan.FromMilliseconds(125), UpdateTransportInfo);
     });
   }
 
@@ -85,17 +86,17 @@ public class MainVm : ViewModelBase, IHost
 
   private async Task UpdateTransportInfo()
   {
-    TransportInfo? tpi;
+    BeatPosInfo? bpi = null;
     try
     {
-      tpi = await Client.GetTransportInfo();
+      bpi = await Client.GetBeatPos();
     }
     catch
     {
-      tpi = null;
+      bpi = null;
     }
 
-    await Task.WhenAll(Pages.OfType<PlayerPage>().Select(p => p.UpdateTransport(tpi)));
+    await Task.WhenAll(Pages.OfType<PlayerPage>().Select(p => p.UpdateTransport(bpi)));
   }
 
   internal async Task LoadSetlist(string filename)

@@ -3,21 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:zuljeah="clr-namespace:Zuljeah"
              xmlns:converters="clr-namespace:Eos.Mvvm.Converters;assembly=Eos.Mvvm"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance local:PlayerPage}"
+             d:DataContext="{d:DesignInstance zuljeah:PlayerPage}"
              d:DesignHeight="450" d:DesignWidth="800">
-  
-  <UserControl.Resources>
-    <converters:EventedConverter x:Key="TimeSpanConverter" OnConvert="TimeSpanConverter_OnOnConvert" /> 
-  </UserControl.Resources>
 
   <DockPanel>
 
-    <Border DockPanel.Dock="Top" Background="DarkGreen" Height="35" >
-      <TextBlock Text="{Binding Path=Transport, Converter={StaticResource TimeSpanConverter}, TargetNullValue=No connection}" DockPanel.Dock="Top" 
-                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                 FontFamily="Consolas" FontSize="20" Foreground="LightYellow"/>
+    <Border DockPanel.Dock="Top" Background="DarkGreen" Height="35">
+      <UniformGrid Columns="1">
+        <!--
+        <TextBlock Text="{Binding Path=BeatString, TargetNullValue=No connection}" DockPanel.Dock="Top" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Consolas" FontSize="20" Foreground="LightYellow"/>
+        -->
+        <TextBlock Text="{Binding Path=PlayState, TargetNullValue=No connection}" DockPanel.Dock="Top" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontFamily="Consolas" FontSize="20" Foreground="LightYellow"/>
+      </UniformGrid>
     </Border>
 
   </DockPanel>

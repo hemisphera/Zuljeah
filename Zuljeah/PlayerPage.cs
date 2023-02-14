@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DevExpress.Data.Extensions;
@@ -34,11 +35,23 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   private IHost Host { get; }
 
-  public TransportInfo? Transport
+  public TransportPlayState PlayState
   {
-    get => GetAutoFieldValue<TransportInfo?>();
+    get => GetAutoFieldValue<TransportPlayState>();
     private set => SetAutoFieldValue(value);
   }
+
+  public TimeSpan? TimePosition
+  {
+    get => GetAutoFieldValue<TimeSpan?>();
+    private set => SetAutoFieldValue(value);
+  }
+
+  public int BeatsPerMeasure { get; private set; }
+
+  public int CurrBeats { get; private set; }
+
+  public string BeatString => GetBeatString(CurrBeats, BeatsPerMeasure);
 
   public TracklistPart Tracklist { get; }
 
@@ -100,14 +113,27 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
       .ToArray();
   }
 
-  public async Task UpdateTransport(TransportInfo? tpi)
+  private static string GetBeatString(int currBeats, int beatsPerMeasure)
   {
-    Transport = tpi;
-    await Task.WhenAll(Items.ToArray().Select(i => i.UpdateTransport(tpi)));
+    var r = "";
+    for (var i = 0; i < beatsPerMeasure; i++)
+      r += i + 1 <= currBeats ? "O" : ".";
+    return r;
+  }
+
+  internal async Task UpdateTransport(BeatPosInfo? beatPosInfo)
+  {
+    PlayState = beatPosInfo?.PlayState ?? TransportPlayState.Stopped;
+    TimePosition = beatPosInfo?.TimePosition;
+    await Task.WhenAll(Items.ToArray().Select(i => i.UpdateTransport(beatPosInfo?.TimePosition)));
 
     var currentItem = Items.FirstOrDefault(i => i.IsActive);
     if (currentItem != null && currentItem != LastItem)
       LastItem = currentItem;
+
+    BeatsPerMeasure = beatPosInfo?.Numerator ?? 0;
+    CurrBeats = (int)(beatPosInfo?.BeatsInMeasure ?? 0.0) + 1;
+    RaisePropertyChanged(nameof(BeatString));
 
     var oldCurrentItem = CurrentItem;
     CurrentItem = currentItem;
