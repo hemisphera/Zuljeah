@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using DevExpress.Mvvm.POCO;
 using Eos.Mvvm.Commands;
 using Eos.Mvvm.EventArgs;
 using Hsp.Reaper.ApiClient;
@@ -37,16 +38,7 @@ public partial class MainWindow : Window
   {
     if (DataContext is not MainVm dc) return;
     if (dc.CurrentPage is not PlayerPage player) return;
-
-    if (e.Key == Key.Enter)
-      if (player.SelectedItem != null)
-        await player.PlayItem(player.SelectedItem);
-
-    if (e.Key == Key.Escape)
-      await App.MainVmInstance.Client.Stop();
-
-    if (e.Key == Key.Space)
-      await App.MainVmInstance.Client.TogglePause();
+    await player.InvokeAction(new KeyTrigger(e.Key));
   }
 
 }

@@ -9,4 +9,6 @@ public class ZuljeahConfiguration
 
   public bool EnableTracklist { get; set; }
 
+  public string MidiInputDeviceName { get; set; }
+
 }

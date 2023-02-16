@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Eos.Lib.Io;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -21,8 +22,9 @@ public class Setlist : IJsonSerializable
   public List<SetlistItem> Items { get; set; } = new();
 
 
-  internal async Task UpdateFromReaper(ReaperApiClient client)
+  internal async Task UpdateFromReaper()
   {
+    var client = App.Services.GetRequiredService<ReaperApiClient>();
     try
     {
       var regions = await client.ListRegions();

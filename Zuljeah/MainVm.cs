@@ -9,24 +9,21 @@ using Eos.Mvvm.Commands;
 using Eos.Mvvm.EventArgs;
 using Eos.Mvvm.UiModel;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Zuljeah;
 
-public class MainVm : ViewModelBase, IHost
+public class MainVm : ViewModelBase
 {
 
-  public ReaperApiClient Client { get; }
-
-  public Setlist CurrentSetlist { get; } = new();
+  private ReaperApiClient Client { get; }
 
   public UiCommandCategory ActionRoot { get; }
 
 
 
   public ObservableCollection<IPage> Pages { get; } = new();
-
-  private ZuljeahConfiguration Configuration { get; }
 
   public IPage? CurrentPage
   {
@@ -46,23 +43,24 @@ public class MainVm : ViewModelBase, IHost
   }
 
 
-  public MainVm(IOptions<ZuljeahConfiguration> config)
+  public MainVm(ReaperApiClient client)
   {
+    Client = client;
     ActionRoot = new UiCommandCategory();
-    Configuration = config.Value;
-    Client = new ReaperApiClient(config.Value.ReaperUri);
 
     Task.Run(async () =>
     {
-      await Client.RegisterCallback("Tick", TimeSpan.FromMilliseconds(125), UpdateTransportInfo);
+      await client.RegisterCallback("Tick", TimeSpan.FromMilliseconds(125), UpdateTransportInfo);
     });
   }
 
 
   public async Task Initialize(string[] args)
   {
-    await AddPage(new PlayerPage(this, Configuration));
+    await AddPage(App.Services.GetRequiredService<PlayerPage>());
     var filename = args.FirstOrDefault();
+    var bindings = App.Services.GetRequiredService<ActionBindingsEditor>();
+    await bindings.Load();
     if (!String.IsNullOrEmpty(filename))
       await LoadSetlist(filename);
   }
@@ -78,10 +76,6 @@ public class MainVm : ViewModelBase, IHost
     container.CollectFrom(this);
 
     ActionRoot.Pages.AddRange(container);
-
-    //var cp = CurrentPage;
-    //Actions.WithCommandByName<UiCommand>(nameof(ShowSetlistEditorPage), c => c.Enabled = !(cp is SetlistEditorPage));
-    //Actions.WithCommandByName<UiCommand>(nameof(ShowPlayerPage), c => c.Enabled = !(cp is PlayerPage));
   }
 
   private async Task UpdateTransportInfo()
@@ -101,8 +95,9 @@ public class MainVm : ViewModelBase, IHost
 
   internal async Task LoadSetlist(string filename)
   {
-    await CurrentSetlist.Load(filename);
-    await CurrentSetlist.UpdateFromReaper(Client);
+    var setlist = App.Services.GetRequiredService<Setlist>();
+    await setlist.Load(filename);
+    await setlist.UpdateFromReaper();
     if (CurrentPage != null)
       await CurrentPage.Refresh();
   }
@@ -124,16 +119,17 @@ public class MainVm : ViewModelBase, IHost
   [UiCommand(Caption = "Save", Page = "Setlist", Image = "Save")]
   public async Task SaveToFile()
   {
+    var setlist = App.Services.GetRequiredService<Setlist>();
     var fre = new FileRequestEventArgs
     {
       Type = FileRequestEventArgs.RequestType.SaveFile,
-      SelectedPath = CurrentSetlist.Filename,
+      SelectedPath = setlist.Filename,
       Title = "Save from File",
       Filter = "Zuljeah Setlist (*.zuljeah)|*.zuljeah"
     };
     if (await UiSettings.DialogService.RequestFile(fre))
     {
-      await CurrentSetlist.Save(fre.SelectedPath);
+      await setlist.Save(fre.SelectedPath);
       if (CurrentPage != null)
         await CurrentPage.Refresh();
     }
@@ -142,7 +138,14 @@ public class MainVm : ViewModelBase, IHost
   [UiCommand(Caption = "Edit Setlist", Page = "Setlist", Image = "Change")]
   public async Task ShowSetlistEditorPage()
   {
-    await AddPage(new SetlistEditorPage(this));
+    await AddPage(new SetlistEditorPage());
+  }
+
+  [UiCommand(Caption = "Edit Bindings", Page = "Bindings", Image = "Change")]
+  public async Task ShowBindingEditorPage()
+  {
+    var editor = App.Services.GetRequiredService<ActionBindingsEditor>();
+    await AddPage(editor);
   }
 
   public async Task AddPage(IPage page)

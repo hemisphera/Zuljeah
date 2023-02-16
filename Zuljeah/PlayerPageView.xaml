@@ -58,7 +58,7 @@
     <ListView ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" SelectedItem="{Binding Path=SelectedItem}" Padding="15">
       <ItemsControl.ItemTemplate>
         <DataTemplate>
-          <zuljeah:RegionControl PlayStarted="RegionControl_OnPlayStarted" />
+          <zuljeah:RegionControl />
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ListView>

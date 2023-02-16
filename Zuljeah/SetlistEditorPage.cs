@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
+using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Zuljeah;
 
@@ -11,27 +13,24 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   public string Title => "Setlist";
 
-  //public CommandContainer Actions { get; } = new();
-
-  private IHost Host { get; }
+  private Setlist Setlist { get; }
 
 
-  public SetlistEditorPage(IHost host)
+  public SetlistEditorPage()
   {
-    Host = host;
-    //Actions.CollectFrom(this);
+    Setlist = App.Services.GetRequiredService<Setlist>();
   }
 
 
   protected override async Task<IEnumerable<SetlistItem>> GetItems()
   {
-    return await Task.FromResult(Host.CurrentSetlist.Items);
+    return await Task.FromResult(Setlist.Items);
   }
 
 
   public async Task Activate()
   {
-    await Host.CurrentSetlist.UpdateFromReaper(Host.Client);
+    await Setlist.UpdateFromReaper();
     await Refresh();
   }
 
@@ -41,7 +40,7 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     var item = SelectedItem;
     if (item != null)
     {
-      Host.CurrentSetlist.Items.Remove(item);
+      Setlist.Items.Remove(item);
       await Refresh();
     }
   }
@@ -49,8 +48,9 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   [UiCommand(Caption = "Add from REAPER", Page = "Editor", Group = "Edit", Image = "Import")]
   public async Task AddNewRegions()
   {
-    var existingRegions = Host.CurrentSetlist.Items.Select(i => i.RegionId).ToArray();
-    var reaperRegions = await Host.Client.ListRegions();
+    var client = App.Services.GetRequiredService<ReaperApiClient>();
+    var existingRegions = Setlist.Items.Select(i => i.RegionId).ToArray();
+    var reaperRegions = await client.ListRegions();
     foreach (var reaperRegion in reaperRegions.OrderBy(o => o.Start))
     {
       if (existingRegions.Contains(reaperRegion.RegionId)) continue;
@@ -60,7 +60,7 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
         Enabled = true
       };
       si.LoadRegion(reaperRegion);
-      Host.CurrentSetlist.Items.Add(si);
+      Setlist.Items.Add(si);
       await Refresh();
     }
   }

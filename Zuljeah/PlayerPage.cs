@@ -6,12 +6,16 @@ using DevExpress.Data.Extensions;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Hsp.Reaper.ApiClient;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Zuljeah;
 
-internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
+public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 {
+
+  private ReaperApiClient Client { get; }
+
+  private ActionContainer Actions { get; }
 
   public string Title => "Player";
 
@@ -26,14 +30,12 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   public SetlistItem? LastItem
   {
     get => GetAutoFieldValue<SetlistItem>();
-    private set
+    set
     {
       if (SetAutoFieldValue(value))
         RaisePropertyChanged(nameof(NextItem));
     }
   }
-
-  private IHost Host { get; }
 
   public TransportPlayState PlayState
   {
@@ -53,16 +55,14 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   public string BeatString => GetBeatString(CurrBeats, BeatsPerMeasure);
 
-  public TracklistPart Tracklist { get; }
 
 
-  public PlayerPage(IHost host, ZuljeahConfiguration config)
+  public PlayerPage(ReaperApiClient client, ActionContainer actions)
   {
-    Host = host;
-
-    if (config.EnableTracklist)
-      Tracklist = new TracklistPart(host);
+    Client = client;
+    Actions = actions;
   }
+
 
 
   public async Task Activate()
@@ -74,40 +74,38 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   [UiCommand(Caption = "Play", Image = "Start")]
   public async Task Play()
   {
-    var item = SelectedItem;
-    if (item != null)
-      await PlayItem(item);
+    await Actions.Play.Execute();
   }
 
   [UiCommand(Caption = "Pause", Image = "Pause")]
   public async Task Pause()
   {
-    await Host.Client.TogglePause();
+    await Actions.Pause.Execute();
   }
 
   [UiCommand(Caption = "Stop", Image = "Stop")]
   public async Task Stop()
   {
-    await Host.Client.Stop();
+    await Actions.Stop.Execute();
   }
 
   [UiCommand(Caption = "Reset", Image = "Reset")]
-  public async Task Rest()
+  public async Task Reset()
   {
-    LastItem = null;
-    await Host.Client.Stop();
+    await Actions.ResetAction.Execute();
   }
 
   [UiCommand(Caption = "Resynch REAPER", Image = "Reopen")]
   public async Task Resynch()
   {
-    await Host.CurrentSetlist.UpdateFromReaper(Host.Client);
+    await Actions.ResynchAction.Execute();
   }
 
   protected override async Task<IEnumerable<SetlistItem>> GetItems()
   {
-    await Host.CurrentSetlist.UpdateFromReaper(Host.Client);
-    return Host.CurrentSetlist.Items
+    var setlist = App.Services.GetRequiredService<Setlist>();
+    await setlist.UpdateFromReaper();
+    return setlist.Items
       .Where(i => i.Enabled)
       .OrderBy(i => i.Sequence)
       .ToArray();
@@ -144,32 +142,36 @@ internal class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   private async Task FinishPlaying(SetlistItem item)
   {
     if (item.AfterPlayback == AfterPlaybackAction.Pause)
-      await Host.Client.TogglePause();
+      await Client.TogglePause();
     if (item.AfterPlayback == AfterPlaybackAction.Stop)
-      await Host.Client.Stop();
+      await Client.Stop();
+
+    await Actions.MoveNextAction.Execute();
 
     if (item.AfterPlayback == AfterPlaybackAction.Continue)
-      await PlayItem(GetNextItem(item));
-
-    SelectedItem = GetNextItem(item);
+      await Actions.Play.Execute();
   }
 
-  private SetlistItem? GetNextItem(SetlistItem? item)
+  internal SetlistItem? GetNextItem(SetlistItem? item)
   {
     if (item == null) return null;
     var currIndex = Items.IndexOf(item);
     return Items.TryGetValue(currIndex + 1, out var nextItem) ? nextItem : null;
   }
 
-  public async Task PlayItem(SetlistItem? item)
+  internal SetlistItem? GetPreviousItem(SetlistItem? item)
   {
-    await Stop();
-    if (item == null) return;
+    if (item == null) return null;
+    var currIndex = Items.IndexOf(item);
+    return Items.TryGetValue(currIndex - 1, out var nextItem) ? nextItem : null;
+  }
 
-    await Host.Client.GoToRegion(item.RegionId);
-    if (item.StartDelay != null)
-      await Task.Delay(item.StartDelay.Value);
-    await Host.Client.Play();
+  public async Task InvokeAction(ITrigger trigger)
+  {
+    var bindings = App.Services.GetRequiredService<ActionBindingsEditor>();
+    var binding = bindings.FirstOrDefault(b => b.Enabled && b.Trigger?.Equals(trigger) == true);
+    if (binding != null)
+      await binding.Action.Execute();
   }
 
 }

@@ -10,8 +10,9 @@
         xmlns:navImageLibrary="clr-namespace:Eos.NAVImageLibrary;assembly=Eos.NAVImageLibrary"
         xmlns:dataTemplates="clr-namespace:Eos.Mvvm.DataTemplates;assembly=Eos.Mvvm"
         xmlns:mvvm="clr-namespace:Eos.Mvvm;assembly=Eos.Mvvm"
+        xmlns:zuljeah="clr-namespace:Zuljeah"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance local:MainVm}"
+        d:DataContext="{d:DesignInstance zuljeah:MainVm}"
         PreviewKeyDown="MainWindow_OnPreviewKeyDown"
         Title="Zuljeah Reborn" Height="450" Width="800">
 

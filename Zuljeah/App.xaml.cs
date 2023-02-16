@@ -4,7 +4,9 @@ using System.Windows;
 using Eos.Mvvm;
 using Eos.Mvvm.DataTemplates;
 using Eos.Mvvm.EventArgs;
+using Hsp.Reaper.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Zuljeah;
 
@@ -23,14 +25,24 @@ public partial class App : Application
 
   protected override void OnStartup(StartupEventArgs e)
   {
-    base.OnStartup(e);
 
     var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
       .ConfigureServices((context, services) =>
       {
         services.AddOptions<ZuljeahConfiguration>()
           .Bind(context.Configuration);
+
+        services.AddSingleton(sp =>
+        {
+          var config = sp.GetRequiredService<IOptions<ZuljeahConfiguration>>();
+          return new ReaperApiClient(config.Value.ReaperUri);
+        });
+
+        services.AddSingleton<Setlist>();
         services.AddSingleton<MainVm>();
+        services.AddSingleton<ActionBindingsEditor>();
+        services.AddSingleton<PlayerPage>();
+        services.AddSingleton<ActionContainer>();
       });
 
     Host = builder.Build();
@@ -53,6 +65,7 @@ public partial class App : Application
     UiSettings.DialogService = new BasicDialogService();
 
     App.MainVmInstance.Initialize(e.Args);
+    base.OnStartup(e);
   }
 
   private void TimespanNoMillisecondsConverter_OnOnConvert(object? sender, ConverterEventArgs e)

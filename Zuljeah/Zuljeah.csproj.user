@@ -1,12 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup />
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Repos\dotNet\Zulyeah\Zuljeah\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="ActionBindingsEditorView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="PlayerPageView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -16,11 +21,11 @@
     <Compile Update="SetlistEditorPageView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="TransportControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="ActionBindingsEditorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -31,9 +36,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="SetlistEditorPageView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TransportControl.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
