@@ -24,7 +24,7 @@
     <PackageReference Include="Eos.Lib.Io" Version="3.0.16" />
     <PackageReference Include="Eos.Mvvm" Version="3.0.0" />
     <PackageReference Include="Eos.NAVImageLibrary" Version="1.1.1" />
-    <PackageReference Include="Hsp.Reaper.ApiClient" Version="0.1.4" />
+    <PackageReference Include="Hsp.Reaper.ApiClient" Version="0.1.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
