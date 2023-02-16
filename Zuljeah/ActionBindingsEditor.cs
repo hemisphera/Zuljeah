@@ -21,7 +21,7 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
       Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
       "bindings.json");
 
-  public string Title => "Bindings";
+  public string Title => "Trigger Bindings";
 
   public Action[] AllActions
   {
@@ -44,6 +44,14 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
   }
 
 
+
+  [UiCommand(Caption = "Delete", Page = "Editor", Group = "Edit", Image = "Delete")]
+  public async Task Delete()
+  {
+    if (SelectedItem == null) return;
+    await DispatchAsync(() => Items.Remove(SelectedItem));
+    await Task.CompletedTask;
+  }
 
   public async Task Load()
   {
@@ -83,6 +91,7 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
   [UiCommand(Caption = "Close", Page = "Editor", Group = "Edit", Image = "Close")]
   public async Task ClosePage()
   {
+    await Save();
     await App.MainVmInstance.ClosePage(this);
   }
 

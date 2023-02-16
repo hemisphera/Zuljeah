@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using Eos.Mvvm;
 using Eos.Mvvm.DataTemplates;
 using Eos.Mvvm.EventArgs;
 using Hsp.Reaper.ApiClient;
+using Hsp.Reaper.ApiClient.JobScheduler;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Zuljeah;
@@ -29,6 +32,10 @@ public partial class App : Application
     var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
       .ConfigureServices((context, services) =>
       {
+        services.AddLogging(b =>
+        {
+          b.AddFile(context.Configuration.GetSection("Logging"));
+        });
         services.AddOptions<ZuljeahConfiguration>()
           .Bind(context.Configuration);
 
@@ -43,29 +50,31 @@ public partial class App : Application
         services.AddSingleton<ActionBindingsEditor>();
         services.AddSingleton<PlayerPage>();
         services.AddSingleton<ActionContainer>();
+        services.AddSingleton<MidiReceiver>();
       });
 
     Host = builder.Build();
 
-    /*
-    var builder = new ConfigurationBuilder()
-      .SetBasePath(Directory.GetCurrentDirectory())
-      .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-
-
-    Configuration = builder.Build();
-
-    var serviceCollection = new ServiceCollection();
-    ConfigureServices(serviceCollection);
-
-    ServiceProvider = serviceCollection.BuildServiceProvider();
-    */
-
     UiSettings.ViewLocator = new ViewLocator(Assembly.GetExecutingAssembly());
     UiSettings.DialogService = new BasicDialogService();
 
-    App.MainVmInstance.Initialize(e.Args);
+    Task.Run(async () =>
+    {
+      await App.Services.GetRequiredService<MidiReceiver>().Initialize();
+      await App.MainVmInstance.Initialize(e.Args);
+    });
     base.OnStartup(e);
+  }
+
+  protected override void OnExit(ExitEventArgs e)
+  {
+    Task.Run(async () =>
+    {
+      var client = Services.GetRequiredService<ReaperApiClient>();
+      await client.DisposeAsync();
+      var receiver = Services.GetRequiredService<MidiReceiver>();
+      await receiver.DisposeAsync();
+    }).Wait();
   }
 
   private void TimespanNoMillisecondsConverter_OnOnConvert(object? sender, ConverterEventArgs e)

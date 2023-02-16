@@ -35,4 +35,10 @@ internal class KeyTrigger : ITrigger
     return t2.Key == Key;
   }
 
+
+  public override string ToString()
+  {
+    return $"Key: {Key}";
+  }
+
 }

@@ -62,4 +62,10 @@ public class MidiTrigger : ITrigger
       t2.Data2 == Data2;
   }
 
+
+  public override string ToString()
+  {
+    return $"{Command}: Ch{Channel} {Data1} {Data2}";
+  }
+
 }

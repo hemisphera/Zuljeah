@@ -7,6 +7,7 @@ using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Hsp.Reaper.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Zuljeah;
 
@@ -55,12 +56,15 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   public string BeatString => GetBeatString(CurrBeats, BeatsPerMeasure);
 
+  private ILogger<PlayerPage> Logger { get; }
 
 
-  public PlayerPage(ReaperApiClient client, ActionContainer actions)
+
+  public PlayerPage(ReaperApiClient client, ActionContainer actions, ILogger<PlayerPage> logger)
   {
     Client = client;
     Actions = actions;
+    Logger = logger;
   }
 
 
@@ -168,10 +172,14 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   public async Task InvokeAction(ITrigger trigger)
   {
+    Logger.LogDebug($"Received trigger: {trigger}");
     var bindings = App.Services.GetRequiredService<ActionBindingsEditor>();
     var binding = bindings.FirstOrDefault(b => b.Enabled && b.Trigger?.Equals(trigger) == true);
     if (binding != null)
+    {
+      Logger.LogDebug($"Running action '{binding.Action?.Name ?? String.Empty}' for trigger {trigger}");
       await binding.Action.Execute();
+    }
   }
 
 }

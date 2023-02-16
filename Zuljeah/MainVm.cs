@@ -151,7 +151,7 @@ public class MainVm : ViewModelBase
   public async Task AddPage(IPage page)
   {
     Pages.Add(page);
-    CurrentPage = page;
+    CurrentPage = await ValueTask.FromResult(page);
   }
 
   public async Task ClosePage(IPage page)

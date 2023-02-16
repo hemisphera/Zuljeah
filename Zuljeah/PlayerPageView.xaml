@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:zuljeah="clr-namespace:Zuljeah"
-             xmlns:reaper="clr-namespace:Hsp.Reaper.ApiClient;assembly=Hsp.Reaper.ApiClient"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance zuljeah:PlayerPage}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -25,35 +24,6 @@
         </DockPanel>
       </UniformGrid>
     </Border>
-
-    <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding Path=Tracklist.Items}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate DataType="{x:Type reaper:Track}">
-          <DockPanel Width="70" Height="100">
-            <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Name}" HorizontalAlignment="Center"/>
-            <TextBlock DockPanel.Dock="Bottom" Text="{Binding Path=LastMeterPos, StringFormat={}{0}dB}" TextAlignment="Center" />
-            <Border Padding="10,0" CornerRadius="5">
-              <ProgressBar Orientation="Vertical" Value="{Binding Path=LastMeterPos}" Minimum="-150" Maximum="12" Opacity="0.5"
-                           BorderThickness="0" >
-                <ProgressBar.Foreground>
-                  <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
-                    <GradientStop Color="Green" Offset="0"/>
-                    <GradientStop Color="Yellow" Offset="0.5"/>
-                    <GradientStop Color="Red" Offset="1"/>
-                  </LinearGradientBrush>
-                </ProgressBar.Foreground>
-              </ProgressBar>
-            </Border>
-          </DockPanel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <StackPanel IsItemsHost="True" Orientation="Horizontal" />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-
-    </ItemsControl>
 
     <ListView ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" SelectedItem="{Binding Path=SelectedItem}" Padding="15">
       <ItemsControl.ItemTemplate>

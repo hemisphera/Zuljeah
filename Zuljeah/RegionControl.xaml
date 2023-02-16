@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:converters="clr-namespace:Eos.Mvvm.Converters;assembly=Eos.Mvvm"
+             xmlns:zuljeah="clr-namespace:Zuljeah"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance local:SetlistItem}"
+             d:DataContext="{d:DesignInstance zuljeah:SetlistItem}"
              d:DesignHeight="450" d:DesignWidth="800">
 
   <UserControl.Resources>

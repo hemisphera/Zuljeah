@@ -11,12 +11,9 @@ namespace Zuljeah;
 public partial class RegionControl : UserControl
 {
 
-  private static Brush ActiveBrush = new SolidColorBrush(Colors.Orange);
+  private static readonly Brush ActiveBrush = new SolidColorBrush(Colors.Orange);
 
-  private static Brush InactiveBrush = new SolidColorBrush(Colors.LightGray);
-
-
-  public event EventHandler<SetlistItem>? PlayStarted;
+  private static readonly Brush InactiveBrush = new SolidColorBrush(Colors.LightGray);
 
 
   public RegionControl()
