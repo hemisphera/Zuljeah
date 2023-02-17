@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DevExpress.Xpo.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sanford.Multimedia.Midi;
@@ -14,6 +15,8 @@ public class MidiReceiver : IAsyncDisposable
   private PlayerPage Player { get; }
 
   private ILogger<MidiReceiver> Logger { get; }
+
+  public string DeviceName { get; }
 
 
   public MidiReceiver(PlayerPage player, IOptions<ZuljeahConfiguration> config, ILogger<MidiReceiver> logger)
@@ -30,6 +33,7 @@ public class MidiReceiver : IAsyncDisposable
       Device.StartRecording();
 
       var caps = InputDevice.GetDeviceCapabilities(Device.DeviceID);
+      DeviceName = caps.name;
       logger.LogTrace($"Listening for MIDI on device '{caps.name}'.");
     }
   }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DevExpress.Mvvm.POCO;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Zuljeah;
 

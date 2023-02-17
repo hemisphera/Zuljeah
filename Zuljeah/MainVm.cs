@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
 using Eos.Mvvm.Commands;
@@ -21,32 +24,29 @@ public class MainVm : ViewModelBase
 
   public UiCommandCategory ActionRoot { get; }
 
+  public string ApplicationTitle => GetApplicationTitle();
 
 
-  public ObservableCollection<IPage> Pages { get; } = new();
+  public IPage[] Pages
+  {
+    get => GetAutoFieldValue<IPage[]>();
+    private set => SetAutoFieldValue(value);
+  }
 
   public IPage? CurrentPage
   {
     get => GetAutoFieldValue<IPage>();
-    set
-    {
-      SetAutoFieldValue(value);
-      var cp = CurrentPage;
-      if (cp != null)
-        Task.Run(async () =>
-        {
-          await cp.Activate();
-          await cp.Refresh();
-        });
-      UpdateActions();
-    }
+    private set => SetAutoFieldValue(value);
   }
+
+  public bool? CleanupComplete { get; private set; }
 
 
   public MainVm(ReaperApiClient client)
   {
     Client = client;
     ActionRoot = new UiCommandCategory();
+    Pages = Array.Empty<IPage>();
 
     Task.Run(async () =>
     {
@@ -57,25 +57,37 @@ public class MainVm : ViewModelBase
 
   public async Task Initialize(string[] args)
   {
-    await AddPage(App.Services.GetRequiredService<PlayerPage>());
-    var filename = args.FirstOrDefault();
+    var pages = new List<IPage>();
+    pages.Add(App.Services.GetRequiredService<PlayerPage>());
+
     var bindings = App.Services.GetRequiredService<ActionBindingsEditor>();
     await bindings.Load();
+    pages.Add(bindings);
+
+    var setlist = App.Services.GetRequiredService<SetlistEditorPage>();
+    pages.Add(setlist);
+
+    var filename = args.FirstOrDefault();
     if (!String.IsNullOrEmpty(filename))
       await LoadSetlist(filename);
+
+    Pages = pages.ToArray();
+    CurrentPage = Pages.FirstOrDefault();
   }
 
 
   private void UpdateActions()
   {
-    ActionRoot.Pages.Clear();
-
     var container = new CommandContainer();
     if (CurrentPage != null)
       container.CollectFrom(CurrentPage);
     container.CollectFrom(this);
 
-    ActionRoot.Pages.AddRange(container);
+    Dispatch(() =>
+    {
+      ActionRoot.Pages.Clear();
+      ActionRoot.Pages.AddRange(container);
+    });
   }
 
   private async Task UpdateTransportInfo()
@@ -103,63 +115,58 @@ public class MainVm : ViewModelBase
   }
 
 
-  [UiCommand(Caption = "Load", Page = "Setlist", Image = "Import")]
-  public async Task LoadFromFile()
+  public async Task ChangePage(IPage? newPage)
   {
-    var fre = new FileRequestEventArgs
-    {
-      Type = FileRequestEventArgs.RequestType.OpenFile,
-      Title = "Load from File",
-      Filter = "Zuljeah Setlist (*.zuljeah)|*.zuljeah"
-    };
-    if (await UiSettings.DialogService.RequestFile(fre))
-      await LoadSetlist(fre.SelectedPath);
-  }
+    var oldPage = CurrentPage;
+    if (oldPage != null) await oldPage.Deactivate();
 
-  [UiCommand(Caption = "Save", Page = "Setlist", Image = "Save")]
-  public async Task SaveToFile()
-  {
-    var setlist = App.Services.GetRequiredService<Setlist>();
-    var fre = new FileRequestEventArgs
+    CurrentPage = newPage;
+    if (newPage != null)
     {
-      Type = FileRequestEventArgs.RequestType.SaveFile,
-      SelectedPath = setlist.Filename,
-      Title = "Save from File",
-      Filter = "Zuljeah Setlist (*.zuljeah)|*.zuljeah"
-    };
-    if (await UiSettings.DialogService.RequestFile(fre))
-    {
-      await setlist.Save(fre.SelectedPath);
-      if (CurrentPage != null)
-        await CurrentPage.Refresh();
+      await newPage.Activate();
+      await newPage.Refresh();
     }
+
+    UpdateActions();
   }
 
-  [UiCommand(Caption = "Edit Setlist", Page = "Setlist", Image = "Change")]
-  public async Task ShowSetlistEditorPage()
+
+  private string GetApplicationTitle()
   {
-    await AddPage(new SetlistEditorPage());
+    const string title = "Zuljeah Reborn";
+    var parts = new List<string>
+    {
+      title
+    };
+
+    var setlist = App.Services.GetRequiredService<Setlist>();
+    if (!string.IsNullOrEmpty(setlist.Filename))
+      parts.Add(Path.GetFileName(setlist.Filename));
+
+    var receiver = App.Services.GetRequiredService<MidiReceiver>();
+    if (!String.IsNullOrEmpty(receiver.DeviceName))
+      parts.Add(receiver.DeviceName);
+
+    return String.Join(" | ", parts);
   }
 
-  [UiCommand(Caption = "Edit Bindings", Page = "Bindings", Image = "Change")]
-  public async Task ShowBindingEditorPage()
+  public void UpdateApplicationTitle()
   {
-    var editor = App.Services.GetRequiredService<ActionBindingsEditor>();
-    await AddPage(editor);
+    RaisePropertyChanged(nameof(ApplicationTitle));
   }
 
-  public async Task AddPage(IPage page)
+  public async Task Cleanup()
   {
-    Pages.Add(page);
-    CurrentPage = await ValueTask.FromResult(page);
-  }
+    CleanupComplete = false;
+    
+    await ChangePage(null);
 
-  public async Task ClosePage(IPage page)
-  {
-    if (Pages.Contains(page)) Pages.Remove(page);
-    CurrentPage = Pages.FirstOrDefault();
-    if (CurrentPage != null)
-      await CurrentPage.Activate();
+    var client = App.Services.GetRequiredService<ReaperApiClient>();
+    await client.DisposeAsync();
+    var receiver = App.Services.GetRequiredService<MidiReceiver>();
+    await receiver.DisposeAsync();
+
+    CleanupComplete = true;
   }
 
 }

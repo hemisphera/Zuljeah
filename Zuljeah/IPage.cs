@@ -7,10 +7,13 @@ public interface IPage
 
   public string Title { get; }
 
-  //CommandContainer Actions { get; }
+  public string Icon { get; }
+
 
   Task Activate();
 
   Task Refresh();
+
+  Task Deactivate();
 
 }

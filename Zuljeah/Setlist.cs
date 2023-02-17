@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DevExpress.Data.Extensions;
 using Eos.Lib.Io;
 using Hsp.Reaper.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,11 +48,23 @@ public class Setlist : IJsonSerializable
   }
 
 
+  internal async Task<SetlistItem[]> GetPlaylist(bool withUpdate = false)
+  {
+    if (withUpdate) await UpdateFromReaper();
+    return Items
+      .Where(i => i.Enabled)
+      .OrderBy(i => i.Sequence)
+      .ToArray();
+  }
+
+
   public async Task Load(string filename)
   {
     var json = await File.ReadAllTextAsync(filename, Encoding.UTF8);
     FromJson(JObject.Parse(json), Globals.Serializer);
+    await UpdateFromReaper();
     Filename = filename;
+    App.Services.GetRequiredService<MainVm>().UpdateApplicationTitle();
   }
 
   public void FromJson(JObject jo, JsonSerializer serializer)

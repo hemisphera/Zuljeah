@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Eos.Mvvm;
 using Hsp.Reaper.ApiClient;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Zuljeah;
@@ -26,6 +27,16 @@ public class SetlistItem : ObservableEntity
 
   [JsonProperty]
   public AfterPlaybackAction AfterPlayback { get; set; }
+
+  public bool IsSelected
+  {
+    get => GetAutoFieldValue<bool>();
+    set
+    {
+      if (SetAutoFieldValue(value))
+        App.Services.GetRequiredService<PlayerPage>().UpdateSelection(this);
+    }
+  }
 
 
   public string? RegionName => Region?.Name;

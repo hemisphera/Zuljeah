@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Eos.Mvvm;
 using Eos.Mvvm.Attributes;
+using Eos.Mvvm.EventArgs;
 using Hsp.Reaper.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,8 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 {
 
   public string Title => "Setlist";
+
+  public string Icon => "List";
 
   private Setlist Setlist { get; }
 
@@ -34,7 +38,7 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     await Refresh();
   }
 
-  [UiCommand(Caption = "Delete", Page = "Editor", Group = "Edit", Image = "Delete")]
+  [UiCommand(Caption = "Delete", Group = "Edit", Image = "Delete")]
   public async Task RemoveItem()
   {
     var item = SelectedItem;
@@ -45,7 +49,7 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     }
   }
 
-  [UiCommand(Caption = "Add from REAPER", Page = "Editor", Group = "Edit", Image = "Import")]
+  [UiCommand(Caption = "Add from REAPER", Group = "Edit", Image = "Import")]
   public async Task AddNewRegions()
   {
     var client = App.Services.GetRequiredService<ReaperApiClient>();
@@ -65,10 +69,44 @@ public class SetlistEditorPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     }
   }
 
-  [UiCommand(Caption = "Close", Page = "Editor", Group = "Edit", Image = "Close")]
-  public async Task ClosePage()
+
+  [UiCommand(Caption = "Load", Group = "Load/Save", Image = "Import")]
+  public async Task LoadFromFile()
   {
-    await App.MainVmInstance.ClosePage(this);
+    var fre = new FileRequestEventArgs
+    {
+      Type = FileRequestEventArgs.RequestType.OpenFile,
+      Title = "Load from File",
+      Filter = "Zuljeah Setlist (*.zuljeah)|*.zuljeah"
+    };
+    if (await UiSettings.DialogService.RequestFile(fre))
+    {
+      await Setlist.Load(fre.SelectedPath);
+      await Refresh();
+    }
+  }
+
+  [UiCommand(Caption = "Save", Group = "Load/Save", Image = "Save")]
+  public async Task SaveToFile()
+  {
+    var fre = new FileRequestEventArgs
+    {
+      Type = FileRequestEventArgs.RequestType.SaveFile,
+      SelectedPath = Setlist.Filename,
+      Title = "Save from File",
+      Filter = "Zuljeah Setlist (*.zuljeah)|*.zuljeah"
+    };
+    if (await UiSettings.DialogService.RequestFile(fre))
+    {
+      await Setlist.Save(fre.SelectedPath);
+      await Refresh();
+    }
+  }
+
+  public async Task Deactivate()
+  {
+    if (!String.IsNullOrEmpty(Setlist.Filename))
+      await Setlist.Save(Setlist.Filename);
   }
 
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Eos.Mvvm.EventArgs;
 
@@ -13,6 +13,8 @@ public partial class RegionControl : UserControl
 
   private static readonly Brush ActiveBrush = new SolidColorBrush(Colors.Orange);
 
+  private static readonly Brush SelectedBrush = new SolidColorBrush(Colors.LightSkyBlue);
+
   private static readonly Brush InactiveBrush = new SolidColorBrush(Colors.LightGray);
 
 
@@ -21,9 +23,29 @@ public partial class RegionControl : UserControl
     InitializeComponent();
   }
 
-  private void IsActiveBrushConverter_OnOnConvert(object? sender, ConverterEventArgs e)
+  private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
   {
-    e.Result = e.Value is true ? ActiveBrush : InactiveBrush;
+    if (DataContext is not SetlistItem item) return;
+    item.IsSelected = true;
+  }
+
+  private void BorderBrushConverter_OnOnConvert(object? sender, ConverterEventArgs e)
+  {
+    if (e.Value is not object[] arr || arr.Length < 2) return;
+    var isActive = arr[0] is true;
+    var isSelected = arr[1] is true;
+
+    if (isActive)
+    {
+      e.Result = ActiveBrush;
+      return;
+    }
+    if (isSelected)
+    {
+      e.Result = SelectedBrush;
+      return;
+    }
+    e.Result = InactiveBrush;
   }
 
 }

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Zuljeah;
 
-public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
+public class PlayerPage : ObservableEntity, IPage
 {
 
   private ReaperApiClient Client { get; }
@@ -19,6 +19,9 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
   private ActionContainer Actions { get; }
 
   public string Title => "Player";
+
+  public string Icon => "Start";
+
 
   public SetlistItem? CurrentItem
   {
@@ -37,6 +40,7 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
         RaisePropertyChanged(nameof(NextItem));
     }
   }
+
 
   public TransportPlayState PlayState
   {
@@ -58,10 +62,18 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
 
   private ILogger<PlayerPage> Logger { get; }
 
+  public SetlistItem[] Items
+  {
+    get => GetAutoFieldValue<SetlistItem[]>();
+    private set => SetAutoFieldValue(value);
+  }
+
+  public SetlistItem? SelectedItem => Items.FirstOrDefault(i => i.IsSelected);
 
 
   public PlayerPage(ReaperApiClient client, ActionContainer actions, ILogger<PlayerPage> logger)
   {
+    Items = Array.Empty<SetlistItem>();
     Client = client;
     Actions = actions;
     Logger = logger;
@@ -105,14 +117,26 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     await Actions.ResynchAction.Execute();
   }
 
-  protected override async Task<IEnumerable<SetlistItem>> GetItems()
+  public async Task Refresh()
   {
     var setlist = App.Services.GetRequiredService<Setlist>();
-    await setlist.UpdateFromReaper();
-    return setlist.Items
-      .Where(i => i.Enabled)
-      .OrderBy(i => i.Sequence)
-      .ToArray();
+    Items = await setlist.GetPlaylist(true);
+  }
+
+  internal SetlistItem? GetNextItem(SetlistItem? item)
+  {
+    var playlist = Items.ToList();
+    if (item == null) return playlist.FirstOrDefault();
+    var currIndex = playlist.IndexOf(item);
+    return playlist.TryGetValue(currIndex + 1, out var nextItem) ? nextItem : item;
+  }
+
+  internal SetlistItem? GetPreviousItem(SetlistItem? item)
+  {
+    var playlist = Items.ToList();
+    if (item == null) return playlist.FirstOrDefault();
+    var currIndex = playlist.IndexOf(item);
+    return playlist.TryGetValue(currIndex - 1, out var nextItem) ? nextItem : item;
   }
 
   private static string GetBeatString(int currBeats, int beatsPerMeasure)
@@ -156,21 +180,7 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
       await Actions.Play.Execute();
   }
 
-  internal SetlistItem? GetNextItem(SetlistItem? item)
-  {
-    if (item == null) return null;
-    var currIndex = Items.IndexOf(item);
-    return Items.TryGetValue(currIndex + 1, out var nextItem) ? nextItem : null;
-  }
-
-  internal SetlistItem? GetPreviousItem(SetlistItem? item)
-  {
-    if (item == null) return null;
-    var currIndex = Items.IndexOf(item);
-    return Items.TryGetValue(currIndex - 1, out var nextItem) ? nextItem : null;
-  }
-
-  public async Task InvokeAction(ITrigger trigger)
+  public async Task<bool> InvokeAction(ITrigger trigger)
   {
     Logger.LogDebug($"Received trigger: {trigger}");
     var bindings = App.Services.GetRequiredService<ActionBindingsEditor>();
@@ -179,7 +189,22 @@ public class PlayerPage : AsyncItemsViewModelBase<SetlistItem>, IPage
     {
       Logger.LogDebug($"Running action '{binding.Action?.Name ?? String.Empty}' for trigger {trigger}");
       await binding.Action.Execute();
+      return true;
     }
+
+    return false;
+  }
+
+  public async Task Deactivate()
+  {
+    await Task.CompletedTask;
+  }
+
+  internal void UpdateSelection(SetlistItem setlistItem)
+  {
+    if (setlistItem.IsSelected)
+      foreach (var item in Items.Except(new[] { setlistItem }))
+        item.IsSelected = false;
   }
 
 }

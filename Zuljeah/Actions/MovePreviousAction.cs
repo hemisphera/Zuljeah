@@ -7,7 +7,7 @@ namespace Zuljeah;
 public class MovePreviousAction : Action
 {
 
-  public MovePreviousAction() 
+  public MovePreviousAction()
     : base(Guid.Parse("{E6B2E382-52E9-45BA-860E-BB219F4D61CE}"), "Move Previous")
   {
   }
@@ -16,7 +16,8 @@ public class MovePreviousAction : Action
   {
     var player = App.Services.GetRequiredService<PlayerPage>();
     var newItem = player.GetPreviousItem(player.SelectedItem);
-    player.SelectedItem = newItem;
+    if (newItem != null)
+      newItem.IsSelected = true;
     await Task.CompletedTask;
   }
 

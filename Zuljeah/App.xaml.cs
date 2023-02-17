@@ -28,7 +28,6 @@ public partial class App : Application
 
   protected override void OnStartup(StartupEventArgs e)
   {
-
     var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
       .ConfigureServices((context, services) =>
       {
@@ -47,8 +46,11 @@ public partial class App : Application
 
         services.AddSingleton<Setlist>();
         services.AddSingleton<MainVm>();
-        services.AddSingleton<ActionBindingsEditor>();
+
         services.AddSingleton<PlayerPage>();
+        services.AddSingleton<ActionBindingsEditor>();
+        services.AddSingleton<SetlistEditorPage>();
+
         services.AddSingleton<ActionContainer>();
         services.AddSingleton<MidiReceiver>();
       });
@@ -60,21 +62,10 @@ public partial class App : Application
 
     Task.Run(async () =>
     {
-      await App.Services.GetRequiredService<MidiReceiver>().Initialize();
-      await App.MainVmInstance.Initialize(e.Args);
+      await Services.GetRequiredService<MidiReceiver>().Initialize();
+      await MainVmInstance.Initialize(e.Args);
     });
     base.OnStartup(e);
-  }
-
-  protected override void OnExit(ExitEventArgs e)
-  {
-    Task.Run(async () =>
-    {
-      var client = Services.GetRequiredService<ReaperApiClient>();
-      await client.DisposeAsync();
-      var receiver = Services.GetRequiredService<MidiReceiver>();
-      await receiver.DisposeAsync();
-    }).Wait();
   }
 
   private void TimespanNoMillisecondsConverter_OnOnConvert(object? sender, ConverterEventArgs e)

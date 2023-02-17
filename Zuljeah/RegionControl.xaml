@@ -5,16 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:converters="clr-namespace:Eos.Mvvm.Converters;assembly=Eos.Mvvm"
              xmlns:zuljeah="clr-namespace:Zuljeah"
+             xmlns:infrastructure="clr-namespace:Zuljeah.Infrastructure"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance zuljeah:SetlistItem}"
              d:DesignHeight="450" d:DesignWidth="800">
 
   <UserControl.Resources>
-    <converters:EventedConverter x:Key="IsActiveBrushConverter" OnConvert="IsActiveBrushConverter_OnOnConvert" />
+    <infrastructure:EventedMultiConverter x:Key="BorderBrushConverter" OnConvert="BorderBrushConverter_OnOnConvert" />
   </UserControl.Resources>
 
-  <Border Height="80" Padding="2" CornerRadius="2" 
-          BorderThickness="4" BorderBrush="{Binding Path=IsActive, Converter={StaticResource IsActiveBrushConverter}}">
+  <Border Height="80" Padding="2" Margin="5" CornerRadius="0.5" 
+          BorderThickness="8"
+          MouseDown="UIElement_OnMouseDown">
+    <Border.BorderBrush>
+      <MultiBinding Converter="{StaticResource BorderBrushConverter}">
+        <Binding Path="IsActive" />
+        <Binding Path="IsSelected" />
+      </MultiBinding>
+    </Border.BorderBrush>
     <Grid>
       <DockPanel>
         <DockPanel.Background>

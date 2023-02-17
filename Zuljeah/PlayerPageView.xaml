@@ -25,13 +25,13 @@
       </UniformGrid>
     </Border>
 
-    <ListView ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" SelectedItem="{Binding Path=SelectedItem}" Padding="15">
+    <ItemsControl ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" Padding="15">
       <ItemsControl.ItemTemplate>
         <DataTemplate>
           <zuljeah:RegionControl />
         </DataTemplate>
       </ItemsControl.ItemTemplate>
-    </ListView>
+    </ItemsControl>
 
   </DockPanel>
 </UserControl>

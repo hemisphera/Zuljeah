@@ -23,6 +23,8 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
 
   public string Title => "Trigger Bindings";
 
+  public string Icon => "Action";
+
   public Action[] AllActions
   {
     get
@@ -55,25 +57,36 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
 
   public async Task Load()
   {
-    var container = App.Services.GetRequiredService<ActionContainer>();
-    ActionBinding[] newItems;
     if (File.Exists(Filename))
     {
       var content = await File.ReadAllTextAsync(Filename);
-      newItems = JsonConvert.DeserializeObject<ActionBinding[]>(content, new JsonSerializableConverter()) ?? Array.Empty<ActionBinding>();
+      var newItems = JsonConvert.DeserializeObject<ActionBinding[]>(content, new JsonSerializableConverter()) ??
+                     Array.Empty<ActionBinding>();
+      foreach (var item in newItems)
+        Items.Add(item);
     }
     else
-    {
-      newItems = new ActionBinding[]
-      {
-        new(new KeyTrigger(Key.Enter), container.Play),
-        new(new KeyTrigger(Key.Escape), container.Stop),
-        new(new KeyTrigger(Key.Space), container.Pause)
-      };
-    }
+      await InitDefaults();
+  }
 
-    foreach (var item in newItems)
-      Items.Add(item);
+  [UiCommand(Caption = "Init Defaults", Page = "Editor", Group = "Edit", Image = "ReOpen")]
+  public async Task InitDefaults()
+  {
+    var container = App.Services.GetRequiredService<ActionContainer>();
+    var newItems = new ActionBinding[]
+    {
+      new(new KeyTrigger(Key.Enter), container.Play),
+      new(new KeyTrigger(Key.Escape), container.Stop),
+      new(new KeyTrigger(Key.Space), container.Pause),
+      new(new KeyTrigger(Key.Down), container.MoveNextAction),
+      new(new KeyTrigger(Key.Up), container.MovePreviousAction)
+    };
+    await DispatchAsync(() =>
+    {
+      Items.Clear();
+      foreach (var item in newItems)
+        Items.Add(item);
+    });
   }
 
   [UiCommand(Caption = "Save", Page = "Editor", Group = "Edit", Image = "Save")]
@@ -88,11 +101,9 @@ public class ActionBindingsEditor : AsyncItemsViewModelBase<ActionBinding>, IPag
     return Task.CompletedTask;
   }
 
-  [UiCommand(Caption = "Close", Page = "Editor", Group = "Edit", Image = "Close")]
-  public async Task ClosePage()
+  public async Task Deactivate()
   {
     await Save();
-    await App.MainVmInstance.ClosePage(this);
   }
 
 }
