@@ -25,13 +25,15 @@
       </UniformGrid>
     </Border>
 
-    <ItemsControl ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" Padding="15">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <zuljeah:RegionControl />
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <ScrollViewer x:Name="ZheScrollView">
+      <ItemsControl ItemsSource="{Binding Path=Items}" HorizontalContentAlignment="Stretch" Padding="15">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <zuljeah:RegionControl SelectedChanged="RegionControl_OnSelectedChanged" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
 
   </DockPanel>
 </UserControl>

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Zuljeah;
 
@@ -11,6 +12,12 @@ public partial class PlayerPageView : UserControl
   public PlayerPageView()
   {
     InitializeComponent();
+  }
+
+  private void RegionControl_OnSelectedChanged(object? sender, bool e)
+  {
+    if (e)
+      (sender as FrameworkElement)?.BringIntoView();
   }
 
 }

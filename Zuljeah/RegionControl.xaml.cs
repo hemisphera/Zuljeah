@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.ComponentModel;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Eos.Mvvm.EventArgs;
@@ -18,9 +20,25 @@ public partial class RegionControl : UserControl
   private static readonly Brush InactiveBrush = new SolidColorBrush(Colors.LightGray);
 
 
+  public event EventHandler<bool>? SelectedChanged;
+
+
   public RegionControl()
   {
     InitializeComponent();
+    DataContextChanged += (s, e) =>
+    {
+      if (e.OldValue is SetlistItem oi) oi.PropertyChanged -= ItemOnPropertyChanged;
+      if (e.NewValue is SetlistItem ni) ni.PropertyChanged += ItemOnPropertyChanged;
+    };
+  }
+
+
+  private void ItemOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+  {
+    if (e.PropertyName != nameof(SetlistItem.IsSelected)) return;
+    var item = DataContext as SetlistItem;
+    SelectedChanged?.Invoke(this, item?.IsSelected ?? false);
   }
 
   private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
