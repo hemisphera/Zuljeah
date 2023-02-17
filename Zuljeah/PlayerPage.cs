@@ -169,15 +169,8 @@ public class PlayerPage : ObservableEntity, IPage
 
   private async Task FinishPlaying(SetlistItem item)
   {
-    if (item.AfterPlayback == AfterPlaybackAction.Pause)
-      await Client.TogglePause();
-    if (item.AfterPlayback == AfterPlaybackAction.Stop)
-      await Client.Stop();
-
+    await Actions.Pause.Execute();
     await Actions.MoveNextAction.Execute();
-
-    if (item.AfterPlayback == AfterPlaybackAction.Continue)
-      await Actions.Play.Execute();
   }
 
   public async Task<bool> InvokeAction(ITrigger trigger)

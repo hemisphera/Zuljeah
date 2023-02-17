@@ -7,6 +7,7 @@
   <Application.Resources>
 
     <converters:EventedConverter x:Key="TimespanNoMillisecondsConverter" OnConvert="TimespanNoMillisecondsConverter_OnOnConvert" />
+    <converters:EventedConverter x:Key="WhenTrueVisibleConverter" OnConvert="WhenTrueVisibleConverter_OnOnConvert" />
 
   </Application.Resources>
 

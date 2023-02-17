@@ -75,4 +75,9 @@ public partial class App : Application
     e.Result = TimeSpan.FromSeconds(Math.Round(ts.TotalSeconds, 0));
   }
 
+  private void WhenTrueVisibleConverter_OnOnConvert(object? sender, ConverterEventArgs e)
+  {
+    e.Result = e.Value is true ? Visibility.Visible : Visibility.Collapsed;
+  }
+
 }

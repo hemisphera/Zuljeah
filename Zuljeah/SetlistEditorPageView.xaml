@@ -20,7 +20,6 @@
         <dxg:GridColumn FieldName="RegionStart" Header="Start" Width="100" ReadOnly="True" />
         <dxg:GridColumn FieldName="RegionEnd" Header="End" Width="100" ReadOnly="True" />
         <dxg:GridColumn FieldName="RegionDuration" Header="Duration" Width="100" ReadOnly="True" />
-        <dxg:GridColumn FieldName="AfterPlayback" Header="After Playback" Width="80" />
       </dxg:GridControl.Columns>
     </dxg:GridControl>
 

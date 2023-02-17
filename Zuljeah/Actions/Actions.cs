@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Zuljeah;
 
@@ -37,5 +38,11 @@ public class ActionContainer
   public Action MoveNextAction { get; } = new MoveNextAction();
 
   public Action MovePreviousAction { get; } = new MovePreviousAction();
+
+
+  public Action? ById(Guid actionId)
+  {
+    return All.FirstOrDefault(a => a.Id == actionId);
+  }
 
 }

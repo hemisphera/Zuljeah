@@ -38,6 +38,8 @@
                      Height="40"/>
           <TextBlock Text="{Binding Path=RegionTimeRemaining, Converter={StaticResource TimespanNoMillisecondsConverter}}" 
                      HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="Consolas"/>
+          <TextBlock Padding="0" Text="⦿" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="50" Opacity="0.2"
+                     Visibility="{Binding Path=IsSelected, Converter={StaticResource WhenTrueVisibleConverter}}"/>
         </Grid>
       </DockPanel>
     </Grid>

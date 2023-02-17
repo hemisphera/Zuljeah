@@ -25,18 +25,6 @@ public class SetlistItem : ObservableEntity
   [JsonProperty]
   public TimeSpan? StartDelay { get; set; }
 
-  [JsonProperty]
-  public AfterPlaybackAction AfterPlayback { get; set; }
-
-  public bool IsSelected
-  {
-    get => GetAutoFieldValue<bool>();
-    set
-    {
-      if (SetAutoFieldValue(value))
-        App.Services.GetRequiredService<PlayerPage>().UpdateSelection(this);
-    }
-  }
 
 
   public string? RegionName => Region?.Name;
@@ -74,6 +62,16 @@ public class SetlistItem : ObservableEntity
   {
     get => GetAutoFieldValue<bool>();
     private set => SetAutoFieldValue(value);
+  }
+
+  public bool IsSelected
+  {
+    get => GetAutoFieldValue<bool>();
+    set
+    {
+      if (SetAutoFieldValue(value))
+        App.Services.GetRequiredService<PlayerPage>().UpdateSelection(this);
+    }
   }
 
 
