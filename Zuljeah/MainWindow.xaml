@@ -63,25 +63,37 @@
 
   </Window.Resources>
 
-  <dxwui:HamburgerMenu ItemsSource="{Binding Path=Pages}" SelectedItem="{Binding Path=CurrentPage, Mode=OneWay}" SelectedItemChanged="HamburgerMenu_OnSelectedItemChanged">
+  <DockPanel>
 
-    <dxwui:HamburgerMenu.ItemTemplate>
-      <DataTemplate DataType="{x:Type zuljeah:IPage}">
-        <dxwui:HamburgerMenuNavigationButton Glyph="{Binding Path=Icon, Converter={StaticResource SmallGlyphConverter}}" Content="{Binding Path=Title}" />
-      </DataTemplate>
-    </dxwui:HamburgerMenu.ItemTemplate>
+    <StatusBar DockPanel.Dock="Bottom" DataContext="{Binding Path=Status}">
+      <TextBlock Text="{Binding Path=Version}" />
+      <Separator />
+      <TextBlock Text="{Binding Path=MidiDeviceName}" />
+      <Separator />
+      <TextBlock Text="{Binding Path=MidiActivity}" />
+    </StatusBar>
 
-    <dxwui:HamburgerMenu.Content>
-      <DockPanel>
-        <dxr:RibbonControl DockPanel.Dock="Top" ShowApplicationButton="False" ToolbarShowCustomizationButton="False"
-                       ToolbarShowMode="Hide" IsSimplified="True" AllowSimplifiedRibbon="True">
-          <dxr:RibbonDefaultPageCategory DataContext="{Binding Path=ActionRoot}" PagesSource="{Binding Path=Pages}" PageTemplate="{StaticResource PageTemplate}" />
-        </dxr:RibbonControl>
+    <dxwui:HamburgerMenu ItemsSource="{Binding Path=Pages}" SelectedItem="{Binding Path=CurrentPage, Mode=OneWay}" SelectedItemChanged="HamburgerMenu_OnSelectedItemChanged">
 
-        <ContentControl Content="{Binding Path=CurrentPage}" ContentTemplateSelector="{x:Static mvvm:UiSettings.ViewLocator}"/>
-      </DockPanel>
-    </dxwui:HamburgerMenu.Content>
+      <dxwui:HamburgerMenu.ItemTemplate>
+        <DataTemplate DataType="{x:Type zuljeah:IPage}">
+          <dxwui:HamburgerMenuNavigationButton Glyph="{Binding Path=Icon, Converter={StaticResource SmallGlyphConverter}}" Content="{Binding Path=Title}" />
+        </DataTemplate>
+      </dxwui:HamburgerMenu.ItemTemplate>
 
-  </dxwui:HamburgerMenu>
+      <dxwui:HamburgerMenu.Content>
+        <DockPanel>
+          <dxr:RibbonControl DockPanel.Dock="Top" ShowApplicationButton="False" ToolbarShowCustomizationButton="False"
+                             ToolbarShowMode="Hide" IsSimplified="True" AllowSimplifiedRibbon="True">
+            <dxr:RibbonDefaultPageCategory DataContext="{Binding Path=ActionRoot}" PagesSource="{Binding Path=Pages}" PageTemplate="{StaticResource PageTemplate}" />
+          </dxr:RibbonControl>
+
+          <ContentControl Content="{Binding Path=CurrentPage}" ContentTemplateSelector="{x:Static mvvm:UiSettings.ViewLocator}"/>
+        </DockPanel>
+      </dxwui:HamburgerMenu.Content>
+
+    </dxwui:HamburgerMenu>
+
+  </DockPanel>
 
 </Window>

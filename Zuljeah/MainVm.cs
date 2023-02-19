@@ -26,6 +26,8 @@ public class MainVm : ViewModelBase
 
   public string ApplicationTitle => GetApplicationTitle();
 
+  public StatusBroker Status => App.Services.GetRequiredService<StatusBroker>();
+
 
   public IPage[] Pages
   {
@@ -158,7 +160,7 @@ public class MainVm : ViewModelBase
   public async Task Cleanup()
   {
     CleanupComplete = false;
-    
+
     await ChangePage(null);
 
     var client = App.Services.GetRequiredService<ReaperApiClient>();

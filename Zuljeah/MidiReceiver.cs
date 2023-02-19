@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DevExpress.Xpo.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sanford.Multimedia.Midi;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Zuljeah;
 
@@ -30,12 +31,19 @@ public class MidiReceiver : IAsyncDisposable
     if (Device != null)
     {
       Device.ChannelMessageReceived += DeviceOnChannelMessageReceived;
+      Device.MessageReceived += DeviceOnShortMessageReceived;
       Device.StartRecording();
 
       var caps = InputDevice.GetDeviceCapabilities(Device.DeviceID);
       DeviceName = caps.name;
       logger.LogTrace($"Listening for MIDI on device '{caps.name}'.");
     }
+  }
+
+  private void DeviceOnShortMessageReceived(IMidiMessage message)
+  {
+    var status = App.Services.GetRequiredService<StatusBroker>();
+    status.PulseActivity(message);
   }
 
   private void DeviceOnChannelMessageReceived(object? sender, ChannelMessageEventArgs e)

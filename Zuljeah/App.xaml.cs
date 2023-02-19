@@ -6,7 +6,6 @@ using Eos.Mvvm;
 using Eos.Mvvm.DataTemplates;
 using Eos.Mvvm.EventArgs;
 using Hsp.Reaper.ApiClient;
-using Hsp.Reaper.ApiClient.JobScheduler;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -53,6 +52,7 @@ public partial class App : Application
 
         services.AddSingleton<ActionContainer>();
         services.AddSingleton<MidiReceiver>();
+        services.AddSingleton<StatusBroker>();
       });
 
     Host = builder.Build();

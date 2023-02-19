@@ -16,8 +16,11 @@ public partial class PlayerPageView : UserControl
 
   private void RegionControl_OnSelectedChanged(object? sender, bool e)
   {
-    if (e)
-      (sender as FrameworkElement)?.BringIntoView();
+    Dispatcher.Invoke(() =>
+    {
+      if (e)
+        (sender as FrameworkElement)?.BringIntoView();
+    });
   }
 
 }

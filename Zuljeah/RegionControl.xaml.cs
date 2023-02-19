@@ -37,7 +37,7 @@ public partial class RegionControl : UserControl
   private void ItemOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
   {
     if (e.PropertyName != nameof(SetlistItem.IsSelected)) return;
-    var item = DataContext as SetlistItem;
+    var item = Dispatcher.Invoke(() => DataContext as SetlistItem);
     SelectedChanged?.Invoke(this, item?.IsSelected ?? false);
   }
 
